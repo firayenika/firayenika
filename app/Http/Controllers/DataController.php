@@ -82,8 +82,15 @@ class DataController extends Controller
         }
     }
     public function index()
-    {
-        $data = Data::all(); // Mengambil semua data dari model Data
-        return response()->json($data);
-    }
+{
+    $data = Data::latest()->first(); // Adjust this to return the latest data if needed
+
+    return response()->json([
+        'weight1' => $data->weight1,
+        'weight2' => $data->weight2,
+        'percent_weight1' => $data->percent_weight1, // Assuming 1000 is the max weight
+        'percent_weight2' => $data->percent_weight1, // Adjust as per your logic
+    ]);
+}
+
 }
