@@ -9,14 +9,21 @@ class DataController extends Controller
 {
     public function store(Request $request)
     {
-        $data = Data::create($request->all());
+        $data = new Data;
+        $data->weight1 = $request->weight1;
+        $data->weight2 = $request->weight2;
+        $data->percent_weight1 = $request->percent_weight1;
+        $data->percent_weight2 = $request->percent_weight2;
+        $data->save();
 
         // Check if weight1 or weight2 is less than 300 grams
         if ($data->weight1 < 300 || $data->weight2 < 300) {
             $this->sendWhatsAppNotification($data);
         }
 
-        return response()->json($data, 201);
+        return response()->json([
+            "message" => "Data telah ditambahkan."
+        ], 201);
     }
 
     private function sendWhatsAppNotification(Data $data)
