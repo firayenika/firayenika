@@ -16,154 +16,62 @@ class DataController extends Controller
         $data->percent_weight2 = $request->percent_weight2;
         $data->save();
 
-        // Mengirim notifikasi setiap i = 3000
-        if ($data->weight1 < 300 || $data->weight2 < 300) {
-            $i = 0;
-            $b = 0;
-            $c = 0;
-            $d = 0;
-            $e = 0;
-            $f = 0;
-            $w = 300000;
-
-            if ($data->weight1 > 200 && $data->weight2 < 200) {
-                if ($i == 0) {
-                    $this->sendWhatsAppNotification($data);
-                }
-                $i++;
-            } elseif ($data->weight1 < 200 && $data->weight2 > 200) {
-                if ($b== 0) {
-                    $this->sendWhatsAppNotification($data);
-                }
-                $b++;
-            } elseif ($data->weight1 < 200 && $data->weight2 < 200) {
-                if ($d== 0) {
-                    $this->sendWhatsAppNotification($data);
-                }
-                $d++;
-            } elseif ($data->weight1 < 100 && $data->weight2 > 100) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 4; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                } 
-            }elseif ($data->weight1 > 100 && $data->weight2 < 100 && $data->weight2 > 60 && $data->weight1 < 200) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 4; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                } 
-            } elseif ($data->weight1 > 200 && $data->weight2 < 100) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 4; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                }
-            } elseif ($data->weight1 > 60 && $data->weight2 < 60 && $data->weight1 > 100 && $data->weight2 > 100) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 6; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                } 
-            } elseif ($data->weight1 < 60 && $data->weight2 > 60 && $data->weight1 > 100 && $data->weight2 > 100) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 6; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                } 
-            } elseif ($data->weight1 < 60 && $data->weight2 < 60 && $data->weight1 > 100 && $data->weight2 > 100) {
-                if ($c == 0) {
-                    $this->sendWhatsAppNotification($data);
-                    $c++;
-                } elseif ($c == 1) {
-                    for ($c; $c <= 6; $c++) {
-                        if ($w % 30000 == 0) {
-                            $this->sendWhatsAppNotification($data);
-                        }
-                        $c=0;
-                    }
-                } 
-            } elseif ($data->weight1 < 60 && $data->weight2 > 200 && $data->weight2 > 0 && $data->weight1 > 0) {
-                if ($e== 0) {
-                    $this->sendWhatsAppNotification($data);
-                }
-                $e++;
-            } elseif ($data->weight2 < 60 && $data->weight1 > 200 && $data->weight1 > 0 && $data->weight2 > 0) {
-                if ($e==1) {
-                    $this->sendWhatsAppNotification($data);
-                }
-                $e++;
-            } 
-        }
+        // Mengirim notifikasi berdasarkan kondisi berat
+        $this->checkAndSendNotification($data);
 
         return response()->json([
             "message" => "Data telah ditambahkan."
         ], 201);
     }
 
-
-    private function sendWhatsAppNotification(Data $data)
+    private function checkAndSendNotification(Data $data)
     {
-        $apiKey = 'UD#yNu+x__gYSD2dtAqr'; // Ganti dengan API key Fonnte Anda
-        $phoneNumber = '089515563894'; // Nomor WhatsApp tujuan
+        $weight1 = $data->weight1;
+        $weight2 = $data->weight2;
 
-        // Determine notification message based on weight1 or weight2 value
-        $message = '';
-        if ($data->weight1 < 60 && $data->weight2 < 60 ) {
-            $message = 'Kedua infus Habis, lakukan pergantian sekarang';
-        } elseif ($data->weight2 > 60 && $data->weight1 < 60 && $data->weight2 < 100 && $data->weight1 > 0 ) {
-            $message = "Infus 1 Habis, lakukan pergantian sekarang.\n Infus 2 Habis, harap segera diganti.";
-        } elseif ($data->weight2 < 60 && $data->weight1 > 60 && $data->weight1 < 100 && $data->weight2 > 0) {
-            $message = "Infus 2 Habis, lakukan pergantian sekarang.\n Infus 1 Habis, harap segera diganti. ";
-        } elseif ($data->weight1 < 100 && $data->weight2 < 100 && $data->weight2 > 60 && $data->weight1 > 60) {
-            $message = "Kedua infus Habis, harap segera diganti.";
-        } elseif ($data->weight1 < 100 && $data->weight2 > 100 && $data->weight2 < 200 && $data->weight1 < 200) {
-            $message = "Infus 1 Habis, harap segera diganti.\n Infus 2 Hampir habis";
-        } elseif ($data->weight1 > 100 && $data->weight2 < 100 && $data->weight2 < 200 && $data->weight1 < 200) {
-            $message = "Infus 2 Habis, harap segera diganti.\n Infus 1 Hampir habis";
-        } elseif ($data->weight1 < 200 && $data->weight2 < 200 && $data->weight2 > 100 && $data->weight1 > 100) {
-            $message = 'Kedua infus Hampir Habis';
-        } elseif ($data->weight1 < 200 && $data->weight2 > 200 && $data->weight2 < 580 && $data->weight1 > 100) {
-            $message = 'Infus 1 Hampir Habis';
-        } elseif ($data->weight1 > 200 && $data->weight2 < 200 && $data->weight2 > 100 && $data->weight1 < 580) {
-            $message = 'Infus 2 Hampir Habis';
-        } elseif ($data->weight1 > 200 && $data->weight2 < 60 && $data->weight2 > 0 && $data->weight1 < 580) {
-            $message = 'Infus 2 Habis';
-        } elseif ($data->weight2 > 200 && $data->weight1 < 60 && $data->weight1 > 0 && $data->weight2 < 580) {
-            $message = 'Infus 1 Habis';
+        // Kombinasi notifikasi untuk weight1 dan weight2
+        if ($weight1 < 60 && $weight2 > 60) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 1 Habis, Infus 2 Masih Tersedia', 4);
+        } elseif ($weight1 > 60 && $weight2 < 60) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 2 Habis, Infus 1 Masih Tersedia', 4);
+        } elseif ($weight1 < 60 && $weight2 < 60) {
+            $this->sendNotificationMultipleTimes($data, 'Kedua Infus Habis, lakukan pergantian sekarang', 4);
+        } elseif ($weight1 >= 60 && $weight1 < 100 && $weight2 >= 60 && $weight2 < 100) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 1 dan Infus 2 Hampir Habis', 2);
+        } elseif ($weight1 >= 100 && $weight1 < 200 && $weight2 >= 100 && $weight2 < 200) {
+            $this->sendWhatsAppNotification($data, 'Infus 1 dan Infus 2 Hampir Habis');
         }
 
-        // You can customize messages based on your specific requirements
+        // Notifikasi individual untuk weight1
+        if ($weight1 < 60) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 1 Habis, lakukan pergantian sekarang', 4);
+        } elseif ($weight1 >= 60 && $weight1 < 100) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 1 Hampir habis, harap segera diganti', 2);
+        } elseif ($weight1 >= 100 && $weight1 < 200) {
+            $this->sendWhatsAppNotification($data, 'Infus 1 Hampir habis');
+        }
+
+        // Notifikasi individual untuk weight2
+        if ($weight2 < 60) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 2 Habis, lakukan pergantian sekarang', 4);
+        } elseif ($weight2 >= 60 && $weight2 < 100) {
+            $this->sendNotificationMultipleTimes($data, 'Infus 2 Hampir habis, harap segera diganti', 2);
+        } elseif ($weight2 >= 100 && $weight2 < 200) {
+            $this->sendWhatsAppNotification($data, 'Infus 2 Hampir habis');
+        }
+    }
+
+    private function sendNotificationMultipleTimes(Data $data, $message, $times)
+    {
+        for ($i = 0; $i < $times; $i++) {
+            $this->sendWhatsAppNotification($data, $message);
+        }
+    }
+
+    private function sendWhatsAppNotification(Data $data, $message)
+    {
+        $apiKey = 'oAHZV+j+jqkxFpn#stHF'; // Ganti dengan API key Fonnte Anda
+        $phoneNumber = '085852406558'; // Nomor WhatsApp tujuan
 
         // Prepare data for WhatsApp notification
         $postData = json_encode([
@@ -204,6 +112,7 @@ class DataController extends Controller
             \Log::info('WhatsApp notification sent successfully. Response: ' . $response);
         }
     }
+
     public function index()
     {
         $data = Data::latest()->first(); // Adjust this to return the latest data if needed
@@ -215,5 +124,4 @@ class DataController extends Controller
             'percent_weight2' => $data->percent_weight2, // Adjust as per your logic
         ]);
     }
-
 }
