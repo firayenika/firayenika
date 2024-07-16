@@ -16,9 +16,18 @@ class DataController extends Controller
         $data->percent_weight2 = $request->percent_weight2;
         $data->save();
 
-        // Check if weight1 or weight2 is less than 300 grams
+        // Mengirim notifikasi setiap i = 3000
         if ($data->weight1 < 300 || $data->weight2 < 300) {
-            $this->sendWhatsAppNotification($data);
+            static $i = 0;
+            if ($i == 0) {
+                $this->sendWhatsAppNotification($data);
+            } 
+            $i++;
+            
+            if ($i % 30000 == 0) {
+                $this->sendWhatsAppNotification($data);
+                $i=0;
+            } 
         }
 
         return response()->json([
@@ -26,28 +35,32 @@ class DataController extends Controller
         ], 201);
     }
 
+
     private function sendWhatsAppNotification(Data $data)
     {
-        $apiKey = 'oAHZV+j+jqkxFpn#stHF'; // Ganti dengan API key Fonnte Anda
-        $phoneNumber = '085852406558'; // Nomor WhatsApp tujuan
+        $apiKey = 'UD#yNu+x__gYSD2dtAqr'; // Ganti dengan API key Fonnte Anda
+        $phoneNumber = '089515563894'; // Nomor WhatsApp tujuan
 
         // Determine notification message based on weight1 or weight2 value
         $message = '';
-        if ($data->weight1 <= 200 && $data->weight1 >= 0){
-            $message = 'Infus 1, hampir habis';
-            if($data->weight1 <= 100 && $data->weight1 >=0){
-                $message = 'Infus 1 hampir habis, harap segera diganti.';
-            }
-        } elseif($data->weight2 <= 200 && $data->weight2 >= 0){
-            $message = 'Infus 2, hampir habis';
-            if($data->weight2 <= 100){
-                $message = 'Infus 2 hampir habis, harap segera diganti.';
-            }
-        }
-        elseif ($data->weight1 <= 100 && $data->weight2 <= 100) {
-            $message = 'Kedua Infus hampir habis, harap segera diganti.';
+        if ($data->weight1 < 60 && $data->weight2 < 60) {
+            $message = 'Kedua infus Habis, lakukan pergantian sekarang';
+        } elseif ($data->weight1 < 60) {
+            $message = 'Infus 1 Habis, lakukan pergantian sekarang';
+        } elseif ($data->weight2 < 60) {
+            $message = 'Infus 2 Habis, lakukan pergantian sekarang';
+        } elseif ($data->weight1 < 100 && $data->weight2 < 100) {
+            $message = 'Kedua infus Habis, harap segera diganti.';
         } elseif ($data->weight1 < 100) {
-            $message = 'Infus sudah habis, lakukan penggantian segera.';
+            $message = 'Infus 1 Habis, harap segera diganti.';
+        } elseif ($data->weight2 < 100) {
+            $message = 'Infus 2 Habis, harap segera diganti.';
+        } elseif ($data->weight1 < 200 && $data->weight2 < 200) {
+            $message = 'Kedua infus Hampir Habis';
+        } elseif ($data->weight1 < 200) {
+            $message = 'Infus 1 Hampir Habis';
+        } elseif ($data->weight2 < 200) {
+            $message = 'Infus 2 Hampir Habis';
         }
 
         // You can customize messages based on your specific requirements
@@ -75,7 +88,8 @@ class DataController extends Controller
                 'Authorization: ' . $apiKey,
                 'Content-Type: application/json'
             ),
-        ));
+        )
+        );
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
@@ -89,15 +103,15 @@ class DataController extends Controller
         }
     }
     public function index()
-{
-    $data = Data::latest()->first(); // Adjust this to return the latest data if needed
+    {
+        $data = Data::latest()->first(); // Adjust this to return the latest data if needed
 
-    return response()->json([
-        'weight1' => $data->weight1,
-        'weight2' => $data->weight2,
-        'percent_weight1' => $data->percent_weight1, // Assuming 1000 is the max weight
-        'percent_weight2' => $data->percent_weight1, // Adjust as per your logic
-    ]);
-}
+        return response()->json([
+            'weight1' => $data->weight1,
+            'weight2' => $data->weight2,
+            'percent_weight1' => $data->percent_weight1, // Assuming 1000 is the max weight
+            'percent_weight2' => $data->percent_weight2, // Adjust as per your logic
+        ]);
+    }
 
 }
