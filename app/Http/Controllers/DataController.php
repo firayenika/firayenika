@@ -70,8 +70,8 @@ class DataController extends Controller
 
     private function sendWhatsAppNotification(Data $data, $message)
     {
-        $apiKey = 'oAHZV+j+jqkxFpn#stHF'; // Ganti dengan API key Fonnte Anda
-        $phoneNumber = '085852406558'; // Nomor WhatsApp tujuan
+        $apiKey = '+EKUbaJ-8Ha@kMvtmv76'; // Ganti dengan API key Fonnte Anda
+        $phoneNumber = '085692429796'; // Nomor WhatsApp tujuan
 
         // Prepare data for WhatsApp notification
         $postData = json_encode([

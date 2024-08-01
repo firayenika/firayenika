@@ -127,7 +127,7 @@
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('/monfus/public/api/data');
+                const response = await fetch('api/data');
                 const data = await response.json();
                 
                 document.getElementById('weight1').textContent = data.weight1;
